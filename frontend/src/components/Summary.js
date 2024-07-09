@@ -16,9 +16,11 @@ const Summary = ({ summary, onGoBack }) => {
         window.speechSynthesis.speak(utterance);
     };
 
+    const formattedSummary = summary.replace(/\*\*|\*/g, '').replace(/(\n)/g, '<br/>');
+
     return (
         <SummaryContainer>
-            <SummaryText>{summary}</SummaryText>
+            <SummaryText dangerouslySetInnerHTML={{ __html: formattedSummary }}></SummaryText>
             <SaveButton onClick={handleSave}>Save</SaveButton>
             <ReadBackButton onClick={handleReadBack}>Read Back</ReadBackButton>
             <GoBackButton onClick={onGoBack}>Go Back</GoBackButton>

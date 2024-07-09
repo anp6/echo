@@ -1,51 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { ChatContainer, ChatInput, ChatOutput, ChatButton } from '../styles';
+import React, { useState } from 'react';
+import { ChatContainer, ChatInput, ChatOutput, ChatButton, AIResponseContainer, AIIcon } from '../styles';
+import aiIcon from '../assets/face.png'; 
 
 const ChatInterface = () => {
     const [input, setInput] = useState('');
-    const [chatLog, setChatLog] = useState(['Welcome! How can I assist you today?']);
-    const [displayedChat, setDisplayedChat] = useState(['Welcome! How can I assist you today?']);
+    const [chatLog, setChatLog] = useState([
+        // <div key={0}>Feel free to ask me any questions relating to the content you uploaded!</div>
+    ]);
 
     const handleInputChange = (event) => {
         setInput(event.target.value);
     };
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (input.trim()) {
-            setChatLog((prevLog) => [...prevLog, `You: ${input}`, 'AI: This is a mock response.']);
+            setChatLog((prevLog) => [...prevLog, <div key={prevLog.length}>You: {input}</div>, <br key={`br-${prevLog.length}`} />]);
+            try {
+                const response = await fetch('http://localhost:5000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: input }),
+                });
+                const data = await response.json();
+                setChatLog((prevLog) => [
+                    ...prevLog,
+                    <AIResponseContainer key={prevLog.length}>
+                        <AIIcon src={aiIcon} alt="AI Icon" />
+                        <span>{data.response}</span>
+                    </AIResponseContainer>,
+                    <br key={`br-${prevLog.length}`} />
+                ]);
+            } catch (error) {
+                console.error('Error during chat:', error);
+                setChatLog((prevLog) => [
+                    ...prevLog,
+                    <AIResponseContainer key={prevLog.length}>
+                        <AIIcon src={aiIcon} alt="AI Icon" />
+                        <span>AI: Failed to get a response. Please try again.</span>
+                    </AIResponseContainer>,
+                    <br key={`br-${prevLog.length}`} />
+                ]);
+            }
             setInput('');
         }
     };
 
-    useEffect(() => {
-        if (chatLog.length > displayedChat.length) {
-            let index = 0;
-            const newMessage = chatLog[chatLog.length - 1];
-            const interval = setInterval(() => {
-                setDisplayedChat((prev) => {
-                    const lastMessage = prev[prev.length - 1];
-                    return [...prev.slice(0, -1), lastMessage + newMessage[index]];
-                });
-                index++;
-                if (index === newMessage.length) {
-                    clearInterval(interval);
-                    setDisplayedChat((prev) => [...prev, '']);
-                }
-            }, 50); // Adjust typing speed here
-        }
-    }, [chatLog]);
-
     return (
         <ChatContainer>
             <ChatOutput>
-                {displayedChat.map((entry, index) => (
+                {chatLog.map((entry, index) => (
                     <div key={index}>{entry}</div>
                 ))}
             </ChatOutput>
             <div style={{ display: 'flex', width: '80%' }}>
                 <ChatInput
                     type="text"
-                    placeholder="Type your instructions..."
+                    placeholder="Ask Echo..."
                     value={input}
                     onChange={handleInputChange}
                 />

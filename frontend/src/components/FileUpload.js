@@ -1,5 +1,6 @@
 import React from 'react';
-import { UploadButton, FileUploadContainer, SummaryOptions, OptionLabel, OptionSelect } from '../styles';
+import { UploadButton, FileUploadContainer, SummaryOptions, OptionLabel, OptionSelect, InstructionText } from '../styles';
+import uploadIcon from '../assets/sound.png';
 
 const FileUpload = ({ onFileUpload, setLengthOption, setStyleOption, lengthOption, styleOption }) => {
     const handleChange = (event) => {
@@ -11,9 +12,10 @@ const FileUpload = ({ onFileUpload, setLengthOption, setStyleOption, lengthOptio
 
     return (
         <FileUploadContainer>
+            <InstructionText>Click to begin the magic!</InstructionText>
             <UploadButton>
                 <input type="file" accept="audio/*,video/*" onChange={handleChange} />
-                <span>Upload Audio/Video</span>
+                <img src={uploadIcon} alt="Upload Icon" style={{ width: '100px', height: '100px' }} />
             </UploadButton>
             <SummaryOptions>
                 <OptionLabel>Summary Length:</OptionLabel>
