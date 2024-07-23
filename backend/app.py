@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import whisper
+from openai import OpenAI
 import requests
 import json
 from pydub import AudioSegment
@@ -10,8 +10,8 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-# Load the Whisper model
-model = whisper.load_model("small")
+# Initialize OpenAI client
+client = OpenAI(api_key='sk-1111', base_url='https://whisper.k8s-gosha.atlas.illinois.edu/v1')
 
 transcription_text = ""
 
@@ -20,8 +20,8 @@ def summarize_text_with_mistral(text, length, style):
         url = "https://mixtral.k8s-gosha.atlas.illinois.edu/completion"
         prompt = (
             f"<s>[INST]Please summarize the following text. "
-            f"Your summary should include a clear heading, and the body of the summary should be written in a {style} style, with a maximum of {length} words. "
-            f"Make sure to cover the key points and main ideas without including unnecessary details or any special symbols such as * unless necessary. Ensure your summary is cleanly formatted with line spaces between big points/paragraphs.[/INST]\n\n{text}"
+            f"Your summary should include a clear heading, and the body of the summary should be written in {style}, with a maximum of {length} words. Please DO NOT return any text except the summary title and summary."
+            f"Make sure to cover the key points and main ideas without including unnecessary details, or special symbols such as *. Ensure your summary is cleanly formatted with line spaces between big points/paragraphs.[/INST]\n\n{text}"
         )
         myobj = {
             "prompt": prompt,
@@ -34,30 +34,32 @@ def summarize_text_with_mistral(text, length, style):
         response = requests.post(url, data=json.dumps(myobj), headers=headers,
                                  auth=('atlasaiteam', 'jx@U2WS8BGSqwu'), timeout=1000)
         response.raise_for_status()
-        return response.json()
+        
+        # Log the full response
+        # print(f"Mistral API Response: {response.json()}")
+        
+        result = response.json()
+        return result.get("content", "No summary available")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during summarization: {e}")
         return None
 
-def chat_with_mistral(question, context):
-    try:
-        url = "https://mixtral.k8s-gosha.atlas.illinois.edu/completion"
-        prompt = f"<s>[INST]Please answer my questions based on this text: {context}\n\nQuestion: {question}[/INST]"
-        myobj = {
-            "prompt": prompt,
-            "n_predict": -1,
-            "temperature": 0.3
-        }
-        headers = {
-            "Content-Type": "application/json",
-        }
-        response = requests.post(url, data=json.dumps(myobj), headers=headers,
-                                 auth=('atlasaiteam', 'jx@U2WS8BGSqwu'), timeout=1000)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred during chat: {e}")
-        return None
+def transcribe_audio(file_path):
+    retries = 3
+    for attempt in range(retries):
+        try:
+            with open(file_path, 'rb') as audio_file:
+                response = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio_file,
+                    response_format="json"
+                )
+                transcription = response.text
+                return transcription
+        except Exception as e:
+            print(f"An error occurred during transcription attempt {attempt + 1}: {e}")
+            if attempt == retries - 1:
+                return None
 
 @app.route('/summarize-audio', methods=['POST'])
 def summarize_audio():
@@ -87,10 +89,11 @@ def summarize_audio():
     # Start timer for transcription
     start_time = time.time()
 
-    # Transcribe the audio file using Whisper
+    # Transcribe the audio file using Whisper API
     try:
-        result = model.transcribe(wav_path)
-        transcription_text = result["text"]
+        transcription_text = transcribe_audio(wav_path)
+        if transcription_text is None:
+            raise Exception("Failed to transcribe audio")
         transcription_time = time.time() - start_time
         words_transcribed = len(transcription_text.split())
         print(f"Transcription: {transcription_text}")
@@ -108,7 +111,7 @@ def summarize_audio():
         mistral_result = summarize_text_with_mistral(transcription_text, length_option, style_option)
         summary_time = time.time() - start_time
         if mistral_result:
-            summary = mistral_result.get('content', 'No summary available')
+            summary = mistral_result
             print(f"Summary: {summary}")
             print(f"Time taken for summarization: {summary_time} seconds")
         else:
@@ -118,6 +121,26 @@ def summarize_audio():
         summary = 'An error occurred while summarizing the transcription.'
 
     return jsonify({'transcription': transcription_text, 'summary': summary})
+
+def chat_with_mistral(question, context):
+    try:
+        url = "https://mixtral.k8s-gosha.atlas.illinois.edu/completion"
+        prompt = f"<s>[INST]Please answer my questions based on this text. Limit your response to 200 words: {context}\n\nQuestion: {question}[/INST]"
+        myobj = {
+            "prompt": prompt,
+            "n_predict": -1,
+            "temperature": 0.3
+        }
+        headers = {
+            "Content-Type": "application/json",
+        }
+        response = requests.post(url, data=json.dumps(myobj), headers=headers,
+                                 auth=('atlasaiteam', 'jx@U2WS8BGSqwu'), timeout=1000)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred during chat: {e}")
+        return None
 
 @app.route('/chat', methods=['POST'])
 def chat():

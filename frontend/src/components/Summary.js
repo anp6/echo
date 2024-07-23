@@ -16,7 +16,7 @@ const Summary = ({ summary, onGoBack }) => {
         window.speechSynthesis.speak(utterance);
     };
 
-    const formattedSummary = summary.replace(/\*\*|\*/g, '').replace(/(\n)/g, '<br/>');
+    const formattedSummary = summary.replace(/\*\*|\*/g, '').replace(/(\n)/g, '<br />');
 
     return (
         <SummaryContainer>

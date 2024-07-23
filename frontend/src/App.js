@@ -91,7 +91,7 @@ const App = () => {
                             <br /><br />
                             <strong>SOME MORE FUN STUFF YOU CAN DO!</strong>
                             <br /><br />
-                            Use the chat feature to ask more questions
+                            Use the chat feature to ask more questions. This will not be effective for large files!
                             <br /><br />
                             Save your summaries
                             <br /><br />

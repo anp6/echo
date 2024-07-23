@@ -27,9 +27,9 @@ const FileUpload = ({ onFileUpload, setLengthOption, setStyleOption, lengthOptio
                 
                 <OptionLabel>Summary Style:</OptionLabel>
                 <OptionSelect value={styleOption} onChange={(e) => setStyleOption(e.target.value)}>
-                    <option value="paragraph">Paragraph</option>
-                    <option value="bullet point">Points</option>
-                    <option value="mixed paragraph and bullet point">Blended</option>
+                    <option value="paragraphs">Paragraph</option>
+                    <option value="bullet points">Points</option>
+                    <option value="paragraphs AND bullet points">Blended</option>
                 </OptionSelect>
             </SummaryOptions>
         </FileUploadContainer>

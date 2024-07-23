@@ -4,9 +4,7 @@ import aiIcon from '../assets/face.png';
 
 const ChatInterface = () => {
     const [input, setInput] = useState('');
-    const [chatLog, setChatLog] = useState([
-        // <div key={0}>Feel free to ask me any questions relating to the content you uploaded!</div>
-    ]);
+    const [chatLog, setChatLog] = useState([]);
 
     const handleInputChange = (event) => {
         setInput(event.target.value);
@@ -24,11 +22,12 @@ const ChatInterface = () => {
                     body: JSON.stringify({ question: input }),
                 });
                 const data = await response.json();
+                const formattedResponse = data.response.replace(/\n/g, '<br />');
                 setChatLog((prevLog) => [
                     ...prevLog,
                     <AIResponseContainer key={prevLog.length}>
                         <AIIcon src={aiIcon} alt="AI Icon" />
-                        <span>{data.response}</span>
+                        <span dangerouslySetInnerHTML={{ __html: formattedResponse }}></span>
                     </AIResponseContainer>,
                     <br key={`br-${prevLog.length}`} />
                 ]);
