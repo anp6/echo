@@ -50,7 +50,8 @@ Echo needs your OpenAI API key to function. The application is coded to read it 
 You can create a .env file in the root of the project directory:
 # .env
 OPENAI_API_KEY="your_secret_api_key_here"
-Use code with caution.
+
+
 Note: The application doesn't use python-dotenv, so you will need to load this variable into your shell session yourself or modify the code to use it.
 Alternatively, you can set it directly in your terminal:
 # For macOS / Linux
