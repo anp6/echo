@@ -5,7 +5,6 @@
 
 Echo is a powerful tool that leverages AI to transcribe and summarize audio content. Whether you have an audio file or a YouTube link, Echo can provide you with a full text transcription and a concise, easy-to-read summary.
 
-Note: I've created a sample screenshot for you. You can replace it with your own!
 
 ## 🌟 Features
 Dual Source Input: Process audio from local file uploads (.mp3, .wav, etc.) or directly from a YouTube URL.
@@ -59,9 +58,6 @@ export OPENAI_API_KEY="your_secret_api_key_here"
 
 # For Windows (Command Prompt)
 set OPENAI_API_KEY="your_secret_api_key_here"
-Use code with caution.
-Sh
-
 
 ## 🏃‍♀️ Usage
 Once the installation is complete, run the application with the following command:
