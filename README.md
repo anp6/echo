@@ -3,34 +3,38 @@
 
 ![alt text](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-Echo is a powerful tool that leverages AI to transcribe and summarize audio content. Whether you have an audio file or a YouTube link, Echo can provide you with a full text transcription and a concise, easy-to-read summary.
+Echo is a powerful tool that transforms audio recordings into an interactive knowledge base. It provides highly accurate transcriptions and customizable summaries, and features a powerful AI chatbot that allows you to gain insights from hours worth of content in seconds.
 
 
-## 🌟 Features
-Dual Source Input: Process audio from local file uploads (.mp3, .wav, etc.) or directly from a YouTube URL.
-Accurate Transcription: Utilizes OpenAI's Whisper model for highly accurate speech-to-text transcription.
-Intelligent Summarization: Employs a GPT model (gpt-3.5-turbo) to generate concise summaries of the transcribed text.
-Adjustable Model Size: Choose from different Whisper model sizes (tiny, base, small, medium, large) to balance speed and accuracy.
-User-Friendly Interface: A simple and interactive web UI built with Gradio.
-🚀 Getting Started
-Follow these instructions to get a local copy up and running.
+## ✨ Key Features
+🎙️ High-Fidelity Transcription: Employs OpenAI's Whisper to accurately convert speech from audio files into text.
+✍️ Customizable Summaries: Tailor summaries to your exact needs before processing by choosing:
+- Length: From a quick Compact summary to a Detailed overview.
+- Style: Format the output as a Paragraph, Bulleted Points, a Blended mix, or a Structured response.
+💬 Interactive Q&A Chatbot: After generating a summary, you can:
+- Query Your Document: Ask specific questions about the content of the audio ("What were the main arguments against the proposal?").
+- Explore Beyond the Text: Ask questions that require external knowledge, leveraging the AI's general intelligence ("What are some applications of this technology not mentioned in the lecture?").
+🗣️ Text-to-Speech: Have the generated summary read aloud to you with a single click.
+💾 Save & Export: Instantly save your summary as a .txt file.
+🧩 Modular by Design: The backend is built with swappable components, making it easy for developers to integrate new or different models for transcription and language processing in the future.
+
+## Important Note on AI Models
+The original version of Echo used a private, university-hosted Mixtral model for its summarization and chatbot features. This model is no longer publicly accessible.
+
+For a new user to enable the summarization and chatbot functionalities, you will need to modify the backend (summarizer.py and chatbot.py) to call a different LLM via an API (like OpenAI, Anthropic, Cohere, or a local model). The application's modular design makes this process straightforward. See the "For Developers" section below.
 
 ## Prerequisites
 Before you begin, ensure you have the following installed:
 
-1. Python 3.9+
-2. FFmpeg: Whisper requires FFmpeg to be installed on your system for audio processing.
--> On macOS: brew install ffmpeg
--> On Windows: Download from the official site and add to your system's PATH.
--> On Linux: sudo apt update && sudo apt install ffmpeg
-3. OpenAI API Key: You need an API key from OpenAI to use the summarization feature. Get your key from the OpenAI Platform.
-4. Installation
-5. Clone the repository:
-git clone https://github.com/anp6/echo.git
-cd echo
-Use code with caution.
-Sh
-6. Create and activate a virtual environment (recommended):
+Python 3.9+
+FFmpeg: Whisper requires FFmpeg for audio processing.
+On macOS: brew install ffmpeg
+On Windows: Download from the official site and add to your system's PATH.
+On Linux: sudo apt update && sudo apt install ffmpeg
+An API Key for an LLM (e.g., OpenAI) to enable summarization/chat features.
+
+## Create and activate a virtual environment (recommended):
+
 # For macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
@@ -38,17 +42,12 @@ source venv/bin/activate
 # For Windows
 python -m venv venv
 .\venv\Scripts\activate
-Use code with caution.
-Sh
-Install the required packages:
-pip install -r requirements.txt
-Use code with caution.
-Sh
-Set up your environment variable:
+
+# Set up your environment variable:
 Echo needs your OpenAI API key to function. The application is coded to read it from an environment variable called OPENAI_API_KEY.
-You can create a .env file in the root of the project directory:
-# .env
-OPENAI_API_KEY="your_secret_api_key_here"
+1. Create a .env file in the root of the project directory:
+
+2. Add this line to the file: OPENAI_API_KEY="your_secret_api_key_here"
 
 
 Note: The application doesn't use python-dotenv, so you will need to load this variable into your shell session yourself or modify the code to use it.
@@ -78,50 +77,53 @@ Provide Input:
 
 
 ## ⚙️ How It Works
-The application follows a simple but powerful pipeline:
+Step 1: On the home screen, select your desired Summary Length and Summary Style.
+Step 2: Click the central icon to upload an audio or video file.
+![demo1](assets/demo1.png)
 
-1. Input Handling: Based on the user's choice, the app either downloads the audio from a YouTube link using yt-dlp or accepts a direct file upload.
-2. Audio Conversion: All input audio is converted to a standard .wav format using ffmpeg for consistent processing.
-3. Transcription: The audio file is passed to the selected OpenAI Whisper model, which transcribes the speech into text.
-4. Summarization: The transcribed text is sent to the OpenAI GPT-3.5-turbo API with a prompt asking it to create a concise summary.
-5. Display: The final transcription and summary are displayed back to the user in the Gradio interface.
+Step 3: Click Summarize! and wait for the transcription and summarization to complete.
+Step 4: Interact with your results on the main screen:
+-Read the complete summary on the left.
+-Click Save to download it, or Read Back to listen to it.
+![demo2](assets/demo2.png)
+
+Use the chatbot panel on the right to ask follow-up questions.
+Click Go Back to start over with a new file.
+![demo3](assets/demo3.png)
 
 
 ## 📂 Project Structure
 echo/
+├── assets/                 # Static assets like images and logos for the UI.
+├── backend/                # Core logic for all AI functionalities.
+│   ├── chatbot.py
+│   ├── summarizer.py
+│   ├── transcriber.py
+│   └── tts.py
+├── frontend/               # UI components built with Gradio.
+│   └── app.py
 ├── .gitignore
-├── main.py            # Main script: orchestrates the UI (Gradio) and the processing pipeline.
-├── requirements.txt   # List of Python dependencies for the project.
-├── summarizer.py      # Handles the text summarization using the OpenAI API.
-├── transcriber.py     # Manages audio transcription using the Whisper model.
-└── utils.py           # Contains helper functions (e.g., downloading from YouTube).
-Use code with caution.
+├── main.py                 # Main entry point to run the application.
+├── README.md
+└── requirements.txt        # Python dependencies.
 
 
-## 🤝 Contributing
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+## 💻 For Developers: Making It Your Own
+This project is designed to be easily adapted. To restore full functionality, you'll need to connect the summarizer.py and chatbot.py modules to an active Large Language Model.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+# Example: Swapping in the OpenAI API
 
-Fork the Project
-Create your Feature Branch (git checkout -b feature/AmazingFeature)
-Commit your Changes (git commit -m 'Add some AmazingFeature')
-Push to the Branch (git push origin feature/AmazingFeature)
-Open a Pull Request
-📄 License
-This project is open-source. While no license is currently specified, we recommend adding one. The MIT License is a great choice for permissive open-source projects.
+Open backend/summarizer.py.
+Import the openai library and use your API key (loaded from the .env file) to make a call to the GPT-3.5/4 API.
+Pass the transcribed text and a prompt constructed from the user's length/style preferences.
+Repeat a similar process for backend/chatbot.py to handle the conversational logic.
 
-## 🙏 Acknowledgments
-This project wouldn't be possible without these incredible open-source libraries and services:
-
-OpenAI Whisper
-OpenAI API
-Gradio
-yt-dlp
-FFmpeg
+## 🔮 Future Updates
+The original vision for Echo included direct transcription from YouTube links. While this feature was deprecated due to model incompatibilities, it's a prime candidate for future development. With modern APIs, this could be re-integrated to make the tool even more versatile.
 
 
-![demo1](assets/demo1.png)
-![demo2](assets/demo1.png)
-![demo3](assets/demo1.png)
+
+
+
+
 
