@@ -77,22 +77,29 @@ Provide Input:
 
 
 ## ⚙️ How It Works
-Step 1: On the home screen, select your desired Summary Length and Summary Style.
-Step 2: Click the central icon to upload an audio or video file.
+1. On the home screen, select your desired Summary Length and Summary Style.
+   
+2. Click the central icon to upload an audio or video file.
+   
 ![demo1](assets/demo1.png)
 
-Step 3: Click Summarize! and wait for the transcription and summarization to complete.
-Step 4: Interact with your results on the main screen:
+3. Click Summarize! and wait for the transcription and summarization to complete.
+   
+4. Interact with your results on the main screen:
 -Read the complete summary on the left.
 -Click Save to download it, or Read Back to listen to it.
+
 ![demo2](assets/demo2.png)
 
-Use the chatbot panel on the right to ask follow-up questions.
-Click Go Back to start over with a new file.
+5. Use the chatbot panel on the right to ask follow-up questions.
+   
+6. Click Go Back to start over with a new file.
+   
 ![demo3](assets/demo3.png)
 
 
 ## 📂 Project Structure
+```
 echo/
 ├── assets/                 # Static assets like images and logos for the UI.
 ├── backend/                # Core logic for all AI functionalities.
@@ -106,7 +113,7 @@ echo/
 ├── main.py                 # Main entry point to run the application.
 ├── README.md
 └── requirements.txt        # Python dependencies.
-
+```
 
 ## 💻 For Developers: Making It Your Own
 This project is designed to be easily adapted. To restore full functionality, you'll need to connect the summarizer.py and chatbot.py modules to an active Large Language Model.
